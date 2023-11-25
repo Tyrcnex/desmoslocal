@@ -5,12 +5,40 @@ let graphName = document.getElementById('graphname');
 let saveButton = document.getElementById('save-button');
 let jsonButton = document.getElementById('json-button');
 
+const editGraphJSON = (state) => {
+    let name = graphName.value.trim();
+    let newState = {
+        expr: state.expressions.list,
+    }
+    if (name) newState.tle = name;
+    return newState;
+}
+
+const restoreGraphJSON = (state) => {
+    let newState = {
+        version: 11,
+        randomSeed: "7e22ce48a51bc1451eec62bc6782d4ff",
+        graph: {
+            viewport: {
+                xmin: -10,
+                xmax: 10,
+            }
+        },
+        expressions: {
+            list: state.expr
+        }
+    }
+    return newState;
+}
+
 window.onload = () => {
     let urlParams = new URLSearchParams(window.location.search);
     let rawParam = urlParams.get('d');
     if (rawParam) {
         let decoded = JSON.parse(JSONCrush.uncrush(decodeURIComponent(rawParam)));
-        Calc.setState(decoded);
+        let restoredGraph = restoreGraphJSON(decoded)
+        console.log(restoredGraph);
+        Calc.setState(restoreGraphJSON(decoded));
         if (decoded.tle) graphName.value = decoded.tle;
     }
 }
@@ -25,17 +53,13 @@ const download = (filename, text) => {
     document.body.removeChild(element);
 }
 
-const getGraphJSON = (minify) => {
-    let state = Calc.getState();
-    let name = graphName.value.trim();
-    if (name) state.tle = name;
-    return minify ? JSONCrush.crush(JSON.stringify(state)) : JSON.stringify(state, null, 4);
-}
+const getGraphJSON = () => JSON.stringify(Calc.getState(), null, 4);
 
 const setURL = () => {
-    let compressedJSON = encodeURIComponent(getGraphJSON(true));
-    console.log(decodeURIComponent(compressedJSON));
-    history.pushState({ data: 'data' }, "", `?d=${compressedJSON}`);
+    let editedJSON = editGraphJSON(Calc.getState());
+    let editedJSONString = JSON.stringify(editedJSON);
+    let compressedJSONwithURI = encodeURIComponent(JSONCrush.crush(editedJSONString));
+    history.pushState({ data: 'data' }, "", `?d=${compressedJSONwithURI}`);
 }
 
 saveButton.onclick = e => {
