@@ -5,6 +5,8 @@ let graphName = document.getElementById('graphname');
 let saveButton = document.getElementById('save-button');
 let jsonButton = document.getElementById('json-button');
 
+let saved = JSON.stringify(Calc.getState());
+
 const editGraphJSON = (state) => {
     let name = graphName.value.trim();
     let newState = {
@@ -37,10 +39,14 @@ window.onload = () => {
     if (rawParam) {
         let decoded = JSON.parse(JSONCrush.uncrush(decodeURIComponent(rawParam)));
         let restoredGraph = restoreGraphJSON(decoded)
-        console.log(restoredGraph);
         Calc.setState(restoreGraphJSON(decoded));
         if (decoded.tle) graphName.value = decoded.tle;
     }
+}
+
+window.onbeforeunload = () => {
+    let state = JSON.stringify(Calc.getState());
+    if (state !== saved) return "bernard"
 }
 
 const download = (filename, text) => {
@@ -53,23 +59,22 @@ const download = (filename, text) => {
     document.body.removeChild(element);
 }
 
-const getGraphJSON = () => JSON.stringify(Calc.getState(), null, 4);
-
 const setURL = () => {
     let editedJSON = editGraphJSON(Calc.getState());
     let editedJSONString = JSON.stringify(editedJSON);
     let compressedJSONwithURI = encodeURIComponent(JSONCrush.crush(editedJSONString));
     history.pushState({ data: 'data' }, "", `?d=${compressedJSONwithURI}`);
+    saved = JSON.stringify(Calc.getState())
 }
 
 saveButton.onclick = e => {
     let name = graphName.value.trim();
-    download(`${name ? name : 'Untitled'}.json`, getGraphJSON());
+    download(`${name ? name : 'Untitled'}.json`, JSON.stringify(Calc.getState(), null, 4));
     setURL();
 }
 
 jsonButton.onclick = e => {
-    navigator.clipboard.writeText(getGraphJSON()).then(() => {
+    navigator.clipboard.writeText(JSON.stringify(Calc.getState(), null, 4)).then(() => {
         setURL();
         alert('Copied JSON!');
     });
