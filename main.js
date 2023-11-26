@@ -1,5 +1,5 @@
 let elt = document.getElementById('calculator');
-let Calc = Desmos.GraphingCalculator(elt);
+let Calc = Desmos.GraphingCalculator(elt, { actions: true });
 
 let graphName = document.getElementById('graphname');
 let saveButton = document.getElementById('save-button');
