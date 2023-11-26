@@ -9,10 +9,12 @@ let saved = JSON.stringify(Calc.getState());
 
 const editGraphJSON = (state) => {
     let name = graphName.value.trim();
+    let ticker = state.expressions.ticker;
     let newState = {
         expr: state.expressions.list.filter(e => e.latex?.trim().length !== 0),
     }
     if (name) newState.tle = name;
+    if (ticker) newState.tick = ticker;
     return newState;
 }
 
@@ -27,7 +29,8 @@ const restoreGraphJSON = (state) => {
             }
         },
         expressions: {
-            list: state.expr
+            list: state.expr,
+            ticker: state.tick,
         }
     }
     return newState;
