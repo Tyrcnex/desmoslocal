@@ -10,7 +10,7 @@ let saved = JSON.stringify(Calc.getState());
 const editGraphJSON = (state) => {
     let name = graphName.value.trim();
     let newState = {
-        expr: state.expressions.list,
+        expr: state.expressions.list.filter(e => e.latex?.trim().length !== 0),
     }
     if (name) newState.tle = name;
     return newState;
