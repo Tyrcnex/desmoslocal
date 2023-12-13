@@ -41,7 +41,6 @@ window.onload = () => {
     let rawParam = urlParams.get('d');
     if (rawParam) {
         let decoded = JSON.parse(JSONCrush.uncrush(decodeURIComponent(rawParam)));
-        let restoredGraph = restoreGraphJSON(decoded)
         Calc.setState(restoreGraphJSON(decoded));
         if (decoded.tle) graphName.value = decoded.tle;
     }
